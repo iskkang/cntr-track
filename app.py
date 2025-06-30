@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from track_one import track_one
 import os
+
+from track_one import track_one
+from track_maersk import track_maersk
+from track_cma import track_cma
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
@@ -22,15 +25,16 @@ def track_container():
 
     if carrier == "ONE":
         return jsonify(track_one(container_number))
-
-    return jsonify({
-        'success': False,
-        'error': f"{carrier}는 아직 지원되지 않습니다. 현재는 ONE만 지원됩니다."
-    })
+    elif carrier == "MAERSK":
+        return jsonify(track_maersk(container_number))
+    elif carrier == "CMA-CGM":
+        return jsonify(track_cma(container_number))
+    else:
+        return jsonify({
+            'success': False,
+            'error': f"{carrier}는 아직 지원되지 않습니다. 지원 해운사: ONE, MAERSK, CMA-CGM"
+        })
 
 @app.route('/health')
 def health():
     return jsonify({'status': 'healthy'})
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)

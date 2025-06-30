@@ -1,32 +1,151 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><meta charset="UTF-8"><title>Container Tracker Demo</title></head>
-<body>
-  <h1>컨테이너 추적 데모</h1>
-  <form onsubmit="track(); return false;">
-    <label>선사 코드:</label><input id="carrier" value="MAERSK"><br>
-    <label>컨테이너 번호:</label><input id="container" value="MSCU1234567"><br>
-    <button onclick="openTrackingPage('MAERSK', 'MSKU5149374')">Maersk 추적 열기</button>
-
-<script>
-function openTrackingPage(carrier, containerNumber) {
-    let url = '';
-    switch (carrier.toUpperCase()) {
-        case 'MAERSK':
-            url = `https://www.maersk.com/tracking/${containerNumber}`;
-            break;
-        case 'ONE':
-            url = `https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking?ctrack-field=${containerNumber}&trakNoParam=${containerNumber}`;
-            break;
-        case 'CMA-CGM':
-            url = `https://www.cma-cgm.com/ebusiness/tracking?SearchBy=Container&Reference=${containerNumber}`;
-            break;
-        default:
-            alert('지원되지 않는 선사입니다.');
-            return;
+<head>
+  <meta charset="UTF-8">
+  <title>🛳 컨테이너 추적기</title>
+  <style>
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      background-color: #f6f8fa;
+      text-align: center;
+      padding: 30px;
     }
-    window.open(url, '_blank');
-}
-</script>
+    h1 {
+      color: #333;
+    }
+    .carrier-buttons {
+      margin-bottom: 20px;
+    }
+    .carrier-button {
+      padding: 10px 15px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: all 0.2s ease;
+    }
+    .carrier-button:hover {
+      background-color: #eee;
+    }
+    .carrier-button.selected {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      border-color: #007bff;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 250px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button.track-btn {
+      margin-top: 15px;
+      padding: 10px 25px;
+      font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button.track-btn:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛳 컨테이너 추적기</h1>
+
+  <div class="carrier-buttons">
+    <button class="carrier-button" onclick="selectCarrier('MAERSK')">Maersk</button>
+    <button class="carrier-button" onclick="selectCarrier('ONE')">ONE</button>
+    <button class="carrier-button" onclick="selectCarrier('CMA-CGM')">CMA CGM</button>
+    <button class="carrier-button" onclick="selectCarrier('HMM')">HMM</button>
+    <button class="carrier-button" onclick="selectCarrier('MSC')">MSC</button>
+    <button class="carrier-button" onclick="selectCarrier('EVERGREEN')">Evergreen</button>
+    <button class="carrier-button" onclick="selectCarrier('ZIM')">ZIM</button>
+    <button class="carrier-button" onclick="selectCarrier('HAPAG-LLOYD')">Hapag-Lloyd</button>
+    <button class="carrier-button" onclick="selectCarrier('YANG MING')">Yang Ming</button>
+    <button class="carrier-button" onclick="selectCarrier('OOCL')">OOCL</button>
+    <button class="carrier-button" onclick="selectCarrier('COSCO')">COSCO</button>
+  </div>
+
+  <div>
+    <input type="text" id="container" placeholder="컨테이너 번호를 입력하세요" />
+  </div>
+
+  <button class="track-btn" onclick="track()">🔍 Tracking</button>
+
+  <script>
+    let selectedCarrier = '';
+
+    function selectCarrier(carrier) {
+      selectedCarrier = carrier;
+      const buttons = document.querySelectorAll('.carrier-button');
+      buttons.forEach(btn => {
+        btn.classList.remove('selected');
+        if (btn.innerText.toUpperCase() === carrier) {
+          btn.classList.add('selected');
+        }
+      });
+    }
+
+    function track() {
+      const containerNumber = document.getElementById('container').value.trim();
+      if (!selectedCarrier) {
+        alert("선사를 먼저 선택해주세요.");
+        return;
+      }
+      if (!containerNumber) {
+        alert("컨테이너 번호를 입력해주세요.");
+        return;
+      }
+
+      let url = '';
+      switch (selectedCarrier.toUpperCase()) {
+        case 'MAERSK':
+          url = `https://www.maersk.com/tracking/${containerNumber}`;
+          break;
+        case 'ONE':
+          url = `https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking?ctrack-field=${containerNumber}&trakNoParam=${containerNumber}`;
+          break;
+        case 'CMA-CGM':
+          url = `https://www.cma-cgm.com/eBusiness/tracking/detail/${containerNumber}`;
+          break;
+        case 'HMM':
+          url = `https://www.hmm21.com/cms/business/trackTrace/index.jsp?contno=${containerNumber}`;
+          break;
+        case 'MSC':
+          url = `https://www.msc.com/track-a-shipment?search=${containerNumber}`;
+          break;
+        case 'EVERGREEN':
+          url = `https://www.evergreen-line.com/tms/tms/jsp/Tracking.jsp?Submit=Search&containerNo=${containerNumber}`;
+          break;
+        case 'ZIM':
+          url = `https://www.zim.com/tools/track-a-shipment?containerNumber=${containerNumber}`;
+          break;
+        case 'HAPAG-LLOYD':
+          url = `https://www.hapag-lloyd.com/en/online-business/track/track-by-container.html?container=${containerNumber}`;
+          break;
+        case 'YANG MING':
+          url = `https://www.yangming.com/e-service/track_trace/track_trace_cargo.aspx?container=${containerNumber}`;
+          break;
+        case 'OOCL':
+          url = `https://www.oocl.com/eng/ourservices/eservices/cargotracking/Pages/cargotracking.aspx?bno=${containerNumber}`;
+          break;
+        case 'COSCO':
+          url = `https://elines.coscoshipping.com/ebusiness/cargoTracking?trackingType=1&number=${containerNumber}`;
+          break;
+        default:
+          alert("아직 지원되지 않는 선사입니다.");
+          return;
+      }
+
+      window.open(url, '_blank');
+    }
+  </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+from track_one import track_one
 import os
 
 app = Flask(__name__, static_folder='static')
@@ -16,18 +17,18 @@ def index():
 @app.route('/api/track', methods=['POST'])
 def track_container():
     data = request.get_json()
-    carrier = data.get('carrier')
-    container_number = data.get('container_number')
+    carrier = data.get('carrier', '').upper()
+    container_number = data.get('container_number', '').strip()
+
+    if carrier == "ONE":
+        return jsonify(track_one(container_number))
+
     return jsonify({
-        'success': True,
-        'carrier': carrier,
-        'container_number': container_number,
-        'status': '데모 응답입니다',
-        'current_location': 'Busan Port',
-        'last_update': '2025-06-28T00:00:00Z'
+        'success': False,
+        'error': f"{carrier}는 아직 지원되지 않습니다. 현재는 ONE만 지원됩니다."
     })
 
-@app.route('/health', methods=['GET'])
+@app.route('/health')
 def health():
     return jsonify({'status': 'healthy'})
 

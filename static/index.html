@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>Container Tracker Demo</title></head>
+<body>
+  <h1>컨테이너 추적 데모</h1>
+  <form onsubmit="track(); return false;">
+    <label>선사 코드:</label><input id="carrier" value="MAERSK"><br>
+    <label>컨테이너 번호:</label><input id="container" value="MSCU1234567"><br>
+    <button type="submit">추적</button>
+  </form>
+  <pre id="result"></pre>
+  <script>
+    async function track() {
+      const res = await fetch('/api/track', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          carrier: document.getElementById('carrier').value,
+          container_number: document.getElementById('container').value
+        })
+      });
+      const data = await res.json();
+      document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>

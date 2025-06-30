@@ -1,34 +1,33 @@
 import requests
-from bs4 import BeautifulSoup
-from datetime import datetime
 
 def track_maersk(container_number):
+    url = f"https://api.maersk.com/synergy/tracking/{container_number}?operator=MAEU"
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
+    }
+
     try:
-        url = f"https://www.maersk.com/tracking/{container_number}"
-        headers = {"User-Agent": "Mozilla/5.0"}
+        response = requests.get(url, headers=headers, timeout=10)
+        if response.status_code != 200:
+            return {"success": False, "status": "API 호출 실패", "code": response.status_code}
 
-        res = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(res.text, "html.parser")
+        data = response.json()
+        container_data = data['containers'][0]
 
-        status_el = soup.select_one('[data-testid="shipment-status"]')
-        location_el = soup.select_one('[data-testid="current-location"]')
-
-        status = status_el.text.strip() if status_el else "상태 정보 없음"
-        location = location_el.text.strip() if location_el else "위치 정보 없음"
-
-        return {
-            "success": True,
+        result = {
             "carrier": "MAERSK",
             "container_number": container_number,
-            "status": status,
-            "current_location": location,
-            "last_update": datetime.utcnow().isoformat(),
+            "origin": data.get("origin", {}).get("city", ""),
+            "destination": data.get("destination", {}).get("city", ""),
+            "current_status": container_data.get("status", "정보 없음"),
+            "eta": container_data.get("eta_final_delivery", ""),
+            "last_event": container_data.get("locations", [])[-1]['events'][-1],
+            "last_update": container_data.get("last_update_time", ""),
+            "success": True,
             "source": url
         }
+        return result
+
     except Exception as e:
-        return {
-            "success": False,
-            "carrier": "MAERSK",
-            "container_number": container_number,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}

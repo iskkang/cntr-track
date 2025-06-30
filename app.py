@@ -38,3 +38,7 @@ def track_container():
 @app.route('/health')
 def health():
     return jsonify({'status': 'healthy'})
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))  # Render가 지정한 포트 우선 사용
+    app.run(host='0.0.0.0', port=port)

@@ -59,18 +59,17 @@
 <body>
   <h1>🛳 컨테이너 추적기</h1>
 
-  <div class="carrier-buttons">
-    <button class="carrier-button" onclick="selectCarrier('MAERSK')">Maersk</button>
-    <button class="carrier-button" onclick="selectCarrier('ONE')">ONE</button>
-    <button class="carrier-button" onclick="selectCarrier('CMA-CGM')">CMA CGM</button>
-    <button class="carrier-button" onclick="selectCarrier('HMM')">HMM</button>
-    <button class="carrier-button" onclick="selectCarrier('MSC')">MSC</button>
-    <button class="carrier-button" onclick="selectCarrier('EVERGREEN')">Evergreen</button>
-    <button class="carrier-button" onclick="selectCarrier('ZIM')">ZIM</button>
-    <button class="carrier-button" onclick="selectCarrier('HAPAG-LLOYD')">Hapag-Lloyd</button>
-    <button class="carrier-button" onclick="selectCarrier('YANG MING')">Yang Ming</button>
-    <button class="carrier-button" onclick="selectCarrier('OOCL')">OOCL</button>
-    <button class="carrier-button" onclick="selectCarrier('COSCO')">COSCO</button>
+  <div class="carrier-buttons" id="carrierButtons">
+    <button class="carrier-button" data-carrier="MAERSK">Maersk</button>
+    <button class="carrier-button" data-carrier="ONE">ONE</button>
+    <button class="carrier-button" data-carrier="CMA-CGM">CMA CGM</button>
+    <button class="carrier-button" data-carrier="HMM">HMM</button>
+    <button class="carrier-button" data-carrier="MSC">MSC</button>
+    <button class="carrier-button" data-carrier="ZIM">ZIM</button>
+    <button class="carrier-button" data-carrier="HAPAG-LLOYD">Hapag-Lloyd</button>
+    <button class="carrier-button" data-carrier="YANG MING">Yang Ming</button>
+    <button class="carrier-button" data-carrier="COSCO">COSCO</button>
+    <button class="carrier-button" data-carrier="FESCO">FESCO</button>
   </div>
 
   <div>
@@ -81,17 +80,15 @@
 
   <script>
     let selectedCarrier = '';
+    const buttons = document.querySelectorAll('.carrier-button');
 
-    function selectCarrier(carrier) {
-      selectedCarrier = carrier;
-      const buttons = document.querySelectorAll('.carrier-button');
-      buttons.forEach(btn => {
-        btn.classList.remove('selected');
-        if (btn.innerText.toUpperCase() === carrier) {
-          btn.classList.add('selected');
-        }
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedCarrier = btn.dataset.carrier;
       });
-    }
+    });
 
     function track() {
       const containerNumber = document.getElementById('container').value.trim();
@@ -119,25 +116,23 @@
           url = `https://www.hmm21.com/cms/business/trackTrace/index.jsp?contno=${containerNumber}`;
           break;
         case 'MSC':
-          url = `https://www.msc.com/track-a-shipment?search=${containerNumber}`;
-          break;
-        case 'EVERGREEN':
-          url = `https://www.evergreen-line.com/tms/tms/jsp/Tracking.jsp?Submit=Search&containerNo=${containerNumber}`;
+          url = `https://www.msc.com/en/track-a-shipment?search=${containerNumber}`;
           break;
         case 'ZIM':
-          url = `https://www.zim.com/tools/track-a-shipment?containerNumber=${containerNumber}`;
+          url = `https://www.zim.com/tools/track-a-shipment?consnumber=${containerNumber}`;
           break;
         case 'HAPAG-LLOYD':
-          url = `https://www.hapag-lloyd.com/en/online-business/track/track-by-container.html?container=${containerNumber}`;
+          const withSpaces = containerNumber.slice(0, 4) + '  ' + containerNumber.slice(4);
+          url = `https://www.hapag-lloyd.com/en/online-business/track/track-by-container-solution.html?container=${encodeURIComponent(withSpaces)}`;
           break;
         case 'YANG MING':
-          url = `https://www.yangming.com/e-service/track_trace/track_trace_cargo.aspx?container=${containerNumber}`;
-          break;
-        case 'OOCL':
-          url = `https://www.oocl.com/eng/ourservices/eservices/cargotracking/Pages/cargotracking.aspx?bno=${containerNumber}`;
+          url = `https://e-solution.yangming.com/e-service/track_trace/mul_ctnr.aspx?var=Gu1rcpKMZDot%2fEAwOFyUKAtZYi4c5SsOp6AXZ81iGfOn4YmxTMaPrDvVgqaDoVyJOBBcJxIQzmVbAG3ahAy6j7AUssw4TAHsp%2ftrWAchu04%3d`;
           break;
         case 'COSCO':
           url = `https://elines.coscoshipping.com/ebusiness/cargoTracking?trackingType=1&number=${containerNumber}`;
+          break;
+        case 'FESCO':
+          url = `https://my.fesco.com/tracking?tab=${containerNumber}`;
           break;
         default:
           alert("아직 지원되지 않는 선사입니다.");

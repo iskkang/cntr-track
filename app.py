@@ -1,8 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app)
+
+@app.route('/')
+def index():
+    html_path = os.path.join(app.static_folder, 'index.html')
+    if os.path.exists(html_path):
+        return send_from_directory(app.static_folder, 'index.html')
+    else:
+        return '🛳 컨테이너 추적 API 서버입니다. POST /api/track 으로 요청하세요.'
 
 @app.route('/api/track', methods=['POST'])
 def track_container():

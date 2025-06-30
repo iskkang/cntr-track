@@ -6,22 +6,27 @@
   <form onsubmit="track(); return false;">
     <label>선사 코드:</label><input id="carrier" value="MAERSK"><br>
     <label>컨테이너 번호:</label><input id="container" value="MSCU1234567"><br>
-    <button type="submit">추적</button>
-  </form>
-  <pre id="result"></pre>
-  <script>
-    async function track() {
-      const res = await fetch('/api/track', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          carrier: document.getElementById('carrier').value,
-          container_number: document.getElementById('container').value
-        })
-      });
-      const data = await res.json();
-      document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+    <button onclick="openTrackingPage('MAERSK', 'MSKU5149374')">Maersk 추적 열기</button>
+
+<script>
+function openTrackingPage(carrier, containerNumber) {
+    let url = '';
+    switch (carrier.toUpperCase()) {
+        case 'MAERSK':
+            url = `https://www.maersk.com/tracking/${containerNumber}`;
+            break;
+        case 'ONE':
+            url = `https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking?ctrack-field=${containerNumber}&trakNoParam=${containerNumber}`;
+            break;
+        case 'CMA-CGM':
+            url = `https://www.cma-cgm.com/ebusiness/tracking?SearchBy=Container&Reference=${containerNumber}`;
+            break;
+        default:
+            alert('지원되지 않는 선사입니다.');
+            return;
     }
-  </script>
+    window.open(url, '_blank');
+}
+</script>
 </body>
 </html>
